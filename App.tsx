@@ -79,16 +79,27 @@ const StatCard = ({ title, value, icon: Icon, color, theme }: any) => (
 // --- Componente Principal ---
 
 export default function App() {
-  const [theme, setTheme] = useState<Theme>(() => 
-    (localStorage.getItem('barberflow-theme') as Theme) || 'light'
-  );
-  const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('barberflow-transactions-v3');
-    return saved ? JSON.parse(saved) : [];
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('barberflow-theme') as Theme) || 'light';
+    }
+    return 'light';
   });
+
+  const [transactions, setTransactions] = useState<Transaction[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('barberflow-transactions-v3');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('barberflow-products-v3');
-    return saved ? JSON.parse(saved) : [];
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('barberflow-products-v3');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
   });
 
   const [currentView, setCurrentView] = useState<ViewType>('DASHBOARD');
@@ -99,25 +110,33 @@ export default function App() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    localStorage.setItem('barberflow-transactions-v3', JSON.stringify(transactions));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('barberflow-transactions-v3', JSON.stringify(transactions));
+    }
   }, [transactions]);
 
   useEffect(() => {
-    localStorage.setItem('barberflow-products-v3', JSON.stringify(products));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('barberflow-products-v3', JSON.stringify(products));
+    }
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('barberflow-theme', theme);
-    if (theme === 'dark') document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('barberflow-theme', theme);
+      if (theme === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    }
   }, [theme]);
 
   // Fix para scroll no mobile quando o menu está aberto
   useEffect(() => {
-    if (isSidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+    if (typeof window !== 'undefined') {
+      if (isSidebarOpen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'unset';
+      }
     }
   }, [isSidebarOpen]);
 
