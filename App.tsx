@@ -39,6 +39,12 @@ const COLORS = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 // --- Componentes ---
 
+const AppLogo = ({ size = 20, className = "" }: { size?: number, className?: string }) => (
+  <div className={`flex items-center justify-center bg-indigo-600 rounded-lg p-1.5 shadow-lg shadow-indigo-500/20 ${className}`}>
+    <Scissors size={size} className="text-white" />
+  </div>
+);
+
 const SidebarItem = ({ icon: Icon, label, active, onClick, theme }: any) => (
   <button
     type="button"
@@ -129,7 +135,6 @@ export default function App() {
     }
   }, [theme]);
 
-  // Fix para scroll no mobile quando o menu está aberto
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (isSidebarOpen) {
@@ -139,8 +144,6 @@ export default function App() {
       }
     }
   }, [isSidebarOpen]);
-
-  // --- Funções CRUD ---
 
   const handleSaveTransaction = (t: Omit<Transaction, 'id'>, id?: string) => {
     if (id) {
@@ -186,8 +189,6 @@ export default function App() {
     }
   };
 
-  // --- Memorized Data ---
-
   const filteredData = useMemo(() => filterTransactionsByDate(transactions, dateFilter), [transactions, dateFilter]);
   
   const stats = useMemo(() => {
@@ -205,8 +206,6 @@ export default function App() {
   }, [transactions]);
 
   const pieData = useMemo(() => groupTransactionsByCategory(filteredData), [filteredData]);
-
-  // --- Views ---
 
   const renderDashboard = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
@@ -262,7 +261,10 @@ export default function App() {
       
       {/* Mobile Nav */}
       <header className={`md:hidden sticky top-0 z-40 border-b flex items-center justify-between px-6 py-4 backdrop-blur-md ${theme === 'dark' ? 'bg-slate-950/80 border-slate-800' : 'bg-white/80 border-slate-100'}`}>
-        <h1 className="text-xl font-black tracking-tighter text-indigo-600">BARBER<span className={theme === 'dark' ? 'text-white' : 'text-slate-900'}>FLOW</span></h1>
+        <div className="flex items-center gap-3">
+          <AppLogo size={16} />
+          <h1 className="text-xl font-black tracking-tighter text-indigo-600">BARBER<span className={theme === 'dark' ? 'text-white' : 'text-slate-900'}>FLOW</span></h1>
+        </div>
         <button type="button" onClick={() => setIsSidebarOpen(true)} className="p-2 cursor-pointer touch-manipulation" aria-label="Abrir menu"><Menu size={24} /></button>
       </header>
 
@@ -270,7 +272,10 @@ export default function App() {
       <aside className={`fixed inset-y-0 left-0 z-50 w-72 border-r transform transition-transform duration-500 md:relative md:translate-x-0 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'} ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center justify-between mb-12">
-            <h1 className="text-2xl font-black tracking-tighter text-indigo-600 italic">BARBERFLOW</h1>
+            <div className="flex items-center gap-3">
+              <AppLogo size={24} />
+              <h1 className="text-2xl font-black tracking-tighter text-indigo-600 italic">BARBERFLOW</h1>
+            </div>
             <button type="button" onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 cursor-pointer"><X size={20} /></button>
           </div>
           
@@ -380,11 +385,9 @@ export default function App() {
             </Card>
           )}
 
-          {/* Fallback para evitar tela branca caso o currentView falhe */}
           {!['DASHBOARD', 'CUT', 'INVENTORY', 'EXPENSES', 'STATEMENT'].includes(currentView) && renderDashboard()}
         </div>
 
-        {/* Floating Action Button - Adaptado para Mobile */}
         {currentView !== 'CUT' && (
           <button 
             type="button"
@@ -397,7 +400,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Overlay do menu lateral */}
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-sm md:hidden animate-in fade-in transition-opacity" 
