@@ -86,24 +86,36 @@ const StatCard = ({ title, value, icon: Icon, color, theme }: any) => (
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('barberflow-theme') as Theme) || 'light';
+    try {
+      if (typeof window !== 'undefined') {
+        return (localStorage.getItem('barberflow-theme') as Theme) || 'light';
+      }
+    } catch (e) {
+      console.warn("LocalStorage access failed", e);
     }
     return 'light';
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('barberflow-transactions-v3');
-      return saved ? JSON.parse(saved) : [];
+    try {
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('barberflow-transactions-v3');
+        return saved ? JSON.parse(saved) : [];
+      }
+    } catch (e) {
+      console.error("Failed to parse transactions", e);
     }
     return [];
   });
 
   const [products, setProducts] = useState<Product[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('barberflow-products-v3');
-      return saved ? JSON.parse(saved) : [];
+    try {
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('barberflow-products-v3');
+        return saved ? JSON.parse(saved) : [];
+      }
+    } catch (e) {
+      console.error("Failed to parse products", e);
     }
     return [];
   });
@@ -116,23 +128,29 @@ export default function App() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('barberflow-transactions-v3', JSON.stringify(transactions));
-    }
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('barberflow-transactions-v3', JSON.stringify(transactions));
+      }
+    } catch (e) { /* ignore */ }
   }, [transactions]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('barberflow-products-v3', JSON.stringify(products));
-    }
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('barberflow-products-v3', JSON.stringify(products));
+      }
+    } catch (e) { /* ignore */ }
   }, [products]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('barberflow-theme', theme);
-      if (theme === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-    }
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('barberflow-theme', theme);
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      }
+    } catch (e) { /* ignore */ }
   }, [theme]);
 
   useEffect(() => {
@@ -385,6 +403,7 @@ export default function App() {
             </Card>
           )}
 
+          {/* Fallback de segurança */}
           {!['DASHBOARD', 'CUT', 'INVENTORY', 'EXPENSES', 'STATEMENT'].includes(currentView) && renderDashboard()}
         </div>
 

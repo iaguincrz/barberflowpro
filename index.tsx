@@ -7,17 +7,18 @@ const mountApp = () => {
   if (typeof window === 'undefined') return;
 
   const rootElement = document.getElementById('root');
-  if (!rootElement) {
-    console.warn("Root element not found. This might happen during build or SSR.");
-    return;
+  
+  if (rootElement) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  } else {
+    // Caso o script carregue antes do DOM estar pronto, tenta novamente em curto intervalo
+    setTimeout(mountApp, 10);
   }
-
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
 };
 
 mountApp();
